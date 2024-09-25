@@ -1,5 +1,3 @@
-Voici un résumé des commandes de base pour la configuration des routeurs et des commutateurs Cisco, ainsi que quelques concepts clés comme DTP et VTP.
-
 ### Commandes de Base pour Routeurs et Commutateurs
 
 #### 1-Accès et Configuration

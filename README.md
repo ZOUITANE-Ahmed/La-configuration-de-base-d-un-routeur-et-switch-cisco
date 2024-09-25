@@ -271,13 +271,13 @@ Voici un résumé structuré des informations que vous avez fournies concernant 
 
 ### Résumé des Résultats de la Négociation DTP entre Switches (Sw1 et Sw2)
 
-|  | **État du Port 2**                | **Résultat**                         |
-|------------------------------------|------------------------------------|--------------------------------------|
-| switch1 : Dynamic Auto                       | Dynamic Auto                       | Accès                                |
-| switch1 : Dynamic Desirable                  | Dynamic Auto                       | Trunk                                |
-| switch1 : Trunk                              | Dynamic Auto                       | Trunk                                |
-| switch1 : Access                             | Access                             | Access                               |
-
+|                                    | **sw2 : Dynamic Auto**             | **sw2 : Dynamic Desirable**          | **sw2 : Trunk**    | **sw2 : Access**   |
+|------------------------------------|------------------------------------|--------------------------------------|-----------------------------------------|
+| **sw1 : Dynamic Auto**             | Access                             | Trunk                                |   Trunk            | Access             |
+| **sw1 : Dynamic Desirable**        | Trunk                              | Trunk                                |                    |                    |
+| **sw1 : Trunk**                    | Dynamic Auto                       | Trunk                                |                    |                    |
+| **sw1 : Access**                   | Access                             | Access                               |                    |                    |
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 ### Configuration DTP

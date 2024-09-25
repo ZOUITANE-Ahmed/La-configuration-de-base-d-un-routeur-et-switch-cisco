@@ -229,8 +229,7 @@ Router(config)# ip ssh version 2
 | Affichez les informations sur le système de fichiers Flash | `Switch# show flash`                  |
 | Affichez l'état matériel et logiciel du système        | `Switch# show version`                 |
 | Affichez l'historique des commandes exécutées          | `Switch# show history`                 |
-| Affichez la table d'adresses MAC                       | `Switch# show mac-address-table`       |
-|                                                        | `Switch# show mac address-table`       |
+| Affichez la table d'adresses MAC                       | `Switch# show mac-address-table` ou `Switch# show mac address-table`      |
 
 ### Remarques :
 - **show startup-config** : Montre la configuration sauvegardée lors du dernier redémarrage.

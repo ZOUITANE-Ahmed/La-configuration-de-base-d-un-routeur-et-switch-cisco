@@ -110,6 +110,50 @@ Router(config-if)# ipv6 address 2001:cafe:2::2/64
 Router(config-if)# no shutdown
 Router(config-if)# exit
 ```
+Pour afficher un résumé de toutes les interfaces sur un routeur Cisco, y compris les adresses IPv4 ou IPv6 et l'état opérationnel, vous pouvez utiliser la commande suivante :
+
+### 4-3Commande pour Afficher un Résumé des Interfaces
+```bash
+Router# show ip interface brief
+```
+
+### 4-3-aInformations Fournies par la Commande
+- **Interface :** Nom de l'interface (par exemple, FastEthernet0/0, Serial0/0).
+- **IP Address :** Adresse IPv4 assignée à l'interface.
+- **Status :** État opérationnel de l'interface (par exemple, "up" ou "down").
+- **Protocol :** État du protocole (par exemple, "up" ou "down").
+
+### Exemple de Sortie
+Voici un exemple de sortie de la commande `show ip interface brief` :
+
+```
+Interface              IP Address      Status      Protocol
+FastEthernet0/0       192.168.1.1     up          up
+Serial0/0             2001:db8::1     up          up
+FastEthernet0/1       unassigned      administratively down down
+Serial0/1             192.168.2.1     down        down
+```
+
+### 4-3-bPour les Interfaces IPv6
+Pour afficher un résumé des interfaces avec les adresses IPv6, utilisez la commande suivante :
+
+```bash
+Router# show ipv6 interface brief
+```
+
+### Exemple de Sortie pour IPv6
+Voici un exemple de sortie de la commande `show ipv6 interface brief` :
+
+```
+Interface              IPv6 Address              Status      Protocol
+Serial0/0             2001:db8::1/64            up          up
+FastEthernet0/0       unassigned                 down        down
+```
+
+### Remarques
+- Ces commandes vous permettent de vérifier rapidement l'état et la configuration des interfaces sur votre routeur, facilitant ainsi le dépannage et la gestion du réseau.
+
+
 
 ### 4-Configuration des Mots de Passe
 - **4-1-Accès par terminal :**
@@ -174,4 +218,26 @@ Router(config)# ip ssh version 2
   Switch(config-if)# switchport access vlan vlan-id
   Switch(config-if)# exit
   ```
+### 9-Commandes de vérification ![image](https://github.com/user-attachments/assets/5e52bd5e-fb7b-4f08-9b09-2bfa70c9ab5b)
+
+  Voici un tableau récapitulatif des commandes de vérification sur un commutateur Cisco, avec les tâches et les commandes associées :
+
+| **Tâche**                                               | **Commande IOS**                        |
+|--------------------------------------------------------|-----------------------------------------|
+| Affichez la configuration initiale actuelle            | `Switch# show startup-config`          |
+| Affichez la configuration courante                      | `Switch# show running-config`          |
+| Affichez les informations sur le système de fichiers Flash | `Switch# show flash`                  |
+| Affichez l'état matériel et logiciel du système        | `Switch# show version`                 |
+| Affichez l'historique des commandes exécutées          | `Switch# show history`                 |
+| Affichez la table d'adresses MAC                       | `Switch# show mac-address-table`       |
+|                                                        | `Switch# show mac address-table`       |
+
+### Remarques :
+- **show startup-config** : Montre la configuration sauvegardée lors du dernier redémarrage.
+- **show running-config** : Montre la configuration actuelle en cours d'exécution sur le commutateur.
+- **show flash** : Affiche des informations sur le système de fichiers Flash, y compris l'espace libre et les fichiers stockés.
+- **show version** : Fournit des informations sur le matériel et le logiciel, y compris la version IOS.
+- **show history** : Affiche l'historique des commandes que l'utilisateur a exécutées.
+- **show mac-address-table** ou **show mac address-table** : Affiche la table des adresses MAC, montrant les adresses MAC apprises et les ports correspondants.
+
 

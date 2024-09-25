@@ -27,7 +27,7 @@
   Router(config-if)# no shutdown
   Router(config-if)# exit
   ```
-  - **3-b-ipv6 : Interface FastEthernet :**
+- **3-b-ipv6 : Interface FastEthernet :**
   ```bash
   Router(config)# interface FastEthernet numéro
   Router(config-if)# ipv6 address adresse_ipv6/préfixe

@@ -218,7 +218,7 @@ Router(config)# ip ssh version 2
   Switch(config-if)# switchport access vlan vlan-id
   Switch(config-if)# exit
   ```
-### 9-Commandes de vérification ![image](https://github.com/user-attachments/assets/5e52bd5e-fb7b-4f08-9b09-2bfa70c9ab5b)
+### 9![image](https://github.com/user-attachments/assets/5e52bd5e-fb7b-4f08-9b09-2bfa70c9ab)
 
   Voici un tableau récapitulatif des commandes de vérification sur un commutateur Cisco, avec les tâches et les commandes associées :
 

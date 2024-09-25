@@ -277,7 +277,6 @@ Voici un résumé structuré des informations que vous avez fournies concernant 
 | **sw1 : Dynamic Desirable**        | Trunk                              | Trunk                                |                    |                    |
 | **sw1 : Trunk**                    | Dynamic Auto                       | Trunk                                |                    |                    |
 | **sw1 : Access**                   | Access                             | Access                               |                    |                    |
-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 ### Configuration DTP

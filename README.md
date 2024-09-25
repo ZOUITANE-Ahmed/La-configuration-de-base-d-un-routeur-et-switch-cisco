@@ -20,14 +20,14 @@
   ```
 
 #### 3-Configuration d'Interface FastEthernet ipv4 et ipv6 
-- **3-a-ipv4 : Interface FastEthernet :**
+- **3-a-Interface FastEthernet ipv4 :**
   ```bash
   Router(config)# interface FastEthernet numéro
   Router(config-if)# ip address @ masque_de_sous_réseau
   Router(config-if)# no shutdown
   Router(config-if)# exit
   ```
-- **3-b-ipv6 : Interface FastEthernet :**
+- **3-b-Interface FastEthernet ipv6 :**
   ```bash
   Router(config)# interface FastEthernet numéro
   Router(config-if)# ipv6 address adresse_ipv6/préfixe

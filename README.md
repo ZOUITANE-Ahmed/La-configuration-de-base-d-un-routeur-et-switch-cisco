@@ -240,3 +240,100 @@ Router(config)# ip ssh version 2
 - **show mac-address-table** ou **show mac address-table** : Affiche la table des adresses MAC, montrant les adresses MAC apprises et les ports correspondants.
 
 
+Voici un résumé structuré des informations que vous avez fournies concernant DTP, VTP, et la configuration des trunks sur des commutateurs Cisco :
+
+---
+
+### DTP (Dynamic Trunking Protocol)
+- **Description :** Protocole propriétaire de Cisco utilisé pour la négociation des trunks entre les commutateurs.
+- **Fonctionnalité :** Permet de créer ou de supprimer dynamiquement des trunks selon la configuration des ports.
+
+### VTP (VLAN Trunking Protocol)
+- **Description :** Facilite la gestion des VLANs dans un réseau.
+- **Fonctionnalité :** Propague les informations de VLAN dans le réseau entre les commutateurs connectés via trunks.
+
+### Trunking
+- **ISL (Inter-Switch Link) :**
+  - Protocole d'encapsulation propriétaire de Cisco.
+  - Moins utilisé aujourd'hui en raison de sa spécificité.
+  - Ne supporte pas VLAN Natif.
+
+- **dot1q (IEEE 802.1Q) :**
+  - Norme ouverte utilisée pour le trunking dans des environnements multi-fournisseurs.
+  - Préférée pour son interopérabilité entre différents équipements réseau.
+  - Supporte le VLAN Natif.
+
+### Modes de Port dans DTP
+1. **Access :** Le port appartient à un seul VLAN, sans négociation de trunk.
+2. **Trunk :** Le port transporte le trafic de plusieurs VLANs.
+3. **Dynamic Auto :** Tente de devenir un trunk en envoyant des paquets DTP.
+4. **Dynamic Desirable :** Peut devenir un trunk mais n'initie pas la négociation.
+
+### Résumé des Résultats de la Négociation DTP entre Switches (Sw1 et Sw2)
+
+|  | **État du Port 2**                | **Résultat**                         |
+|------------------------------------|------------------------------------|--------------------------------------|
+| switch1 : Dynamic Auto                       | Dynamic Auto                       | Accès                                |
+| switch1 : Dynamic Desirable                  | Dynamic Auto                       | Trunk                                |
+| switch1 : Trunk                              | Dynamic Auto                       | Trunk                                |
+| switch1 : Access                             | Access                             | Access                               |
+
+
+
+### Configuration DTP
+Pour configurer un port en mode trunk :
+```bash
+Switch1(config-if)# interfac f0/1
+Switch1(config-if)# switchport mode trunk
+Switch1(config-if)# exit
+```
+
+Pour vérifier le trunking :
+```bash
+Switch1# show interfaces trunk
+```
+
+#### Désactivation du Protocole DTP
+Pour désactiver le protocole DTP sur un port :
+```bash
+Switch1(config)# interface f0/1
+Switch1(config-if)# switchport mode trunk
+Switch1(config-if)# switchport nonegotiate
+```
+
+#### Activation du Protocole DTP
+Pour réactiver le protocole DTP :
+```bash
+Switch1(config-if)# no switchport nonegotiate
+```
+
+Pour afficher l'état et la configuration d'une interface spécifique :
+```bash
+Switch1# show interface fastethernet 0/1 switchport
+```
+
+### Fonctionnement du Protocole VTP
+- **Domaines VTP :** Groupes de commutateurs partageant une base de VLANs.
+
+#### Modes VTP :
+1. **Server :** Peut créer, modifier et supprimer des VLANs.
+2. **Client :** Reçoit les informations des VLANs sans modification.
+3. **Transparent :** Ne propage pas les informations de VLANs, mais continue à transmettre les trames.
+
+### Configuration VTP
+Pour configurer un switch en mode serveur VTP :
+```bash
+Switch1(config)# vtp mode server
+Switch1(config)# vtp domain ofppt.local
+Switch1(config)# vtp password 2244
+```
+
+### Vérifier la Configuration VTP
+Pour vérifier l'état VTP :
+```bash
+Switch1# show vtp status
+```
+
+---
+
+Si vous avez besoin de plus d'informations ou d'autres clarifications, n'hésitez pas à demander !

@@ -402,4 +402,76 @@ Switch1# show vtp status
 
 ---
 
-Si vous avez besoin de plus d'informations ou d'autres clarifications, n'hésitez pas à demander !
+####
+Voici les principales commandes HSRP (Hot Standby Router Protocol) que vous pouvez utiliser sur un routeur Cisco pour configurer et gérer HSRP :
+
+### 1. **Configuration de base** :
+Pour configurer HSRP sur une interface spécifique :
+
+```bash
+interface [interface]
+ ip address [adresse_IP] [masque_sous_reseau]
+ standby [groupe] ip [adresse_IP_virtuelle]
+ standby [groupe] priority [priorité]
+ standby [groupe] preempt
+```
+
+### 2. **Détails de la configuration** :
+- **`[interface]`** : l'interface sur laquelle HSRP est configuré (ex. `GigabitEthernet0/1`).
+- **`[adresse_IP]`** : l'adresse IP de l'interface.
+- **`[masque_sous_reseau]`** : le masque de sous-réseau.
+- **`[groupe]`** : le numéro de groupe HSRP (généralement entre 1 et 255).
+- **`[adresse_IP_virtuelle]`** : l'adresse IP partagée par le groupe HSRP.
+- **`[priorité]`** : la priorité du routeur (valeur par défaut : 100).
+
+### 3. **Activer le préemption** :
+Pour activer le préemption, ce qui permet au routeur ayant la plus haute priorité de reprendre le rôle de routeur actif :
+
+```bash
+standby [groupe] preempt
+```
+
+### 4. **Afficher l'état HSRP** :
+Pour afficher l'état HSRP sur une interface :
+
+```bash
+show standby
+```
+
+### 5. **Afficher les informations de groupe HSRP** :
+Pour afficher les détails des groupes HSRP :
+
+```bash
+show standby brief
+```
+
+### 6. **Débogage HSRP** :
+Pour déboguer les messages HSRP :
+
+```bash
+debug standby
+```
+
+### Exemples de configuration :
+
+**Exemple de configuration HSRP sur deux routeurs :**
+
+#### Routeur A :
+```bash
+interface GigabitEthernet0/1
+ ip address 192.168.1.1 255.255.255.0
+ standby 1 ip 192.168.1.254
+ standby 1 priority 110
+ standby 1 preempt
+```
+
+#### Routeur B :
+```bash
+interface GigabitEthernet0/1
+ ip address 192.168.1.2 255.255.255.0
+ standby 1 ip 192.168.1.254
+ standby 1 priority 100
+ standby 1 preempt
+```
+
+Dans cet exemple, le routeur A aura la priorité la plus élevée et sera le routeur actif. Si le routeur A tombe en panne, le routeur B prendra le relais.

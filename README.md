@@ -474,4 +474,75 @@ interface GigabitEthernet0/1
  standby 1 preempt
 ```
 
+
+
+
+
 Dans cet exemple, le routeur A aura la priorité la plus élevée et sera le routeur actif. Si le routeur A tombe en panne, le routeur B prendra le relais.
+
+
+L'inter-VLAN (Virtual Local Area Network) est une méthode permettant la communication entre différents VLANs sur un réseau. Pour mettre en place l'inter-VLAN sur un routeur et un switch, voici les étapes principales en français :
+
+### 1. **Configuration sur le Switch :**
+   - **Créer les VLANs** : Commence par créer les VLANs sur le switch.
+     ```bash
+     Switch(config)# vlan 10
+     Switch(config-vlan)# name Sales
+     Switch(config-vlan)# exit
+     
+     Switch(config)# vlan 20
+     Switch(config-vlan)# name Marketing
+     Switch(config-vlan)# exit
+     ```
+   - **Assigner les ports aux VLANs** :
+     Chaque port correspondant à une machine doit être associé à un VLAN.
+     ```bash
+     Switch(config)# interface FastEthernet 0/1
+     Switch(config-if)# switchport mode access
+     Switch(config-if)# switchport access vlan 10
+     Switch(config-if)# exit
+     
+     Switch(config)# interface FastEthernet 0/2
+     Switch(config-if)# switchport mode access
+     Switch(config-if)# switchport access vlan 20
+     Switch(config-if)# exit
+     ```
+
+   - **Configurer le Trunk** : Le port connecté au routeur doit être en mode trunk pour permettre la transmission des VLANs.
+     ```bash
+     Switch(config)# interface FastEthernet 0/24
+     Switch(config-if)# switchport mode trunk
+     Switch(config-if)# switchport trunk encapsulation dot1q
+     Switch(config-if)# exit
+     ```
+
+### 2. **Configuration sur le Routeur :**
+   Sur le routeur, il est nécessaire de configurer des sous-interfaces pour chaque VLAN afin de permettre l'inter-VLAN routing.
+
+   - **Créer des sous-interfaces pour chaque VLAN** :
+     ```bash
+     Router(config)# interface GigabitEthernet 0/0.10
+     Router(config-subif)# encapsulation dot1Q 10
+     Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+     Router(config-subif)# exit
+     
+     Router(config)# interface GigabitEthernet 0/0.20
+     Router(config-subif)# encapsulation dot1Q 20
+     Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+     Router(config-subif)# exit
+     ```
+
+   - **Activer l'interface physique** :
+     ```bash
+     Router(config)# interface GigabitEthernet 0/0
+     Router(config-if)# no shutdown
+     ```
+
+### 3. **Test de connectivité** :
+   Une fois la configuration terminée, teste la communication entre les VLANs en pingant une machine d'un VLAN depuis une machine d'un autre VLAN. Si tout est correctement configuré, les machines devraient pouvoir communiquer.
+
+### Résumé :
+- Sur le switch : créer les VLANs, assigner les ports aux VLANs et configurer un port trunk.
+- Sur le routeur : créer des sous-interfaces pour chaque VLAN avec encapsulation dot1Q pour l'inter-VLAN routing.
+
+Cela permet d'avoir un réseau segmenté tout en assurant la communication entre les différents segments grâce au routeur.

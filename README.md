@@ -546,3 +546,108 @@ L'inter-VLAN (Virtual Local Area Network) est une méthode permettant la communi
 - Sur le routeur : créer des sous-interfaces pour chaque VLAN avec encapsulation dot1Q pour l'inter-VLAN routing.
 
 Cela permet d'avoir un réseau segmenté tout en assurant la communication entre les différents segments grâce au routeur.
+
+
+-----------------------------------------------------------------------
+
+L'inter-VLAN (ou routage inter-VLAN) est un processus qui permet la communication entre des périphériques situés dans des VLANs différents. Les VLANs (réseaux locaux virtuels) segmentent logiquement un réseau en domaines de diffusion distincts, améliorant ainsi la sécurité et les performances réseau. Cependant, pour que des périphériques dans des VLANs distincts puissent communiquer, un routeur ou un switch de couche 3 est nécessaire.
+
+### Principaux Composants du Routage Inter-VLAN
+
+1. **Router-on-a-Stick** : Une méthode courante consiste à utiliser une interface physique unique sur un routeur, configurée en mode trunk pour gérer plusieurs VLANs. Le routeur crée des sous-interfaces pour chaque VLAN, auxquelles il attribue des adresses IP, permettant ainsi le routage entre eux.
+
+2. **Switchs de Couche 3** : Ces switches combinent des capacités de routage et de commutation dans un seul appareil, permettant le routage inter-VLAN directement. Chaque VLAN reçoit une interface virtuelle séparée (SVI - Switch Virtual Interface) sur le switch de couche 3, qui sert de passerelle par défaut pour les appareils au sein de ce VLAN.
+
+3. **Configuration de Routage** :
+   - **Sous-interfaces** : Pour un router-on-a-stick, chaque VLAN obtient une sous-interface sur le routeur avec sa propre adresse IP et son balisage VLAN (tagging).
+   - **Ports Trunks** : Les ports trunk sur les switches transportent le trafic de plusieurs VLANs. Le routeur ou le switch de couche 3 doit être connecté via un port trunk pour gérer le trafic des VLANs étiquetés.
+
+4. **Adresse de Passerelle** : Chaque VLAN dispose de sa propre adresse IP de passerelle par défaut, généralement configurée sur le routeur ou le switch de couche 3 pour permettre la communication en dehors du VLAN.
+
+### Étapes de Configuration (Router-on-a-Stick)
+
+1. **Créer les VLANs sur le switch** :
+   ```plaintext
+   Switch(config)# vlan 10
+   Switch(config-vlan)# name Vente
+   Switch(config)# vlan 20
+   Switch(config-vlan)# name Marketing
+   ```
+
+2. **Configurer le trunk sur le port du switch connecté au routeur** :
+   ```plaintext
+   Switch(config)# interface gig0/1
+   Switch(config-if)# switchport mode trunk
+   ```
+
+3. **Configurer les sous-interfaces sur le routeur** :
+   ```plaintext
+   Router(config)# interface gig0/0.10
+   Router(config-subif)# encapsulation dot1Q 10
+   Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+
+   Router(config)# interface gig0/0.20
+   Router(config-subif)# encapsulation dot1Q 20
+   Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+   ```
+
+4. **Tester la Connectivité** : Vérifiez que les appareils dans chaque VLAN peuvent pinger leur passerelle par défaut et se connecter entre eux via le routage inter-VLAN.
+
+Grâce au routage inter-VLAN, les différents VLANs peuvent communiquer de manière sécurisée tout en conservant la segmentation logique du réseau.
+
+-------------------------------------------------------------------------------------------------------------
+Voici les propriétés, les avantages et les commandes des protocoles FHRP (First Hop Redundancy Protocols) : **VRRP** (Virtual Router Redundancy Protocol), **HSRP** (Hot Standby Router Protocol) et **GLBP** (Gateway Load Balancing Protocol).
+
+### 1. **VRRP (Virtual Router Redundancy Protocol)**
+#### Propriétés
+- **Normalisé** : VRRP est un protocole standardisé par l'IETF (RFC 5798).
+- **Adressage IP Virtuel** : Il permet à plusieurs routeurs de partager une adresse IP virtuelle, où l'un des routeurs est élu comme maître.
+
+#### Avantages
+- **Interopérabilité** : Puisqu'il est standardisé, il fonctionne avec différents équipements de différents fabricants.
+- **Basé sur les priorités** : La redondance est déterminée par la priorité, et le routeur ayant la plus haute priorité devient le maître.
+
+#### Commandes de base (Cisco IOS)
+```bash
+interface GigabitEthernet0/1
+  vrrp 1 ip 192.168.1.1
+  vrrp 1 priority 120
+  vrrp 1 preempt
+```
+
+### 2. **HSRP (Hot Standby Router Protocol)**
+#### Propriétés
+- **Propriétaire** : HSRP est un protocole propriétaire de Cisco.
+- **État de veille actif/secondaire** : Un routeur est actif, tandis que l'autre reste en mode veille, prêt à prendre la relève si nécessaire.
+
+#### Avantages
+- **Facile à configurer** : Idéal pour les réseaux simples où une redondance basique est nécessaire.
+- **Suivi d'interface** : Possibilité de suivre les interfaces pour détecter les pannes de routeur et basculer automatiquement vers le routeur de secours.
+
+#### Commandes de base (Cisco IOS)
+```bash
+interface GigabitEthernet0/1
+  standby 1 ip 192.168.1.1
+  standby 1 priority 110
+  standby 1 preempt
+```
+
+### 3. **GLBP (Gateway Load Balancing Protocol)**
+#### Propriétés
+- **Propriétaire** : GLBP est également un protocole propriétaire de Cisco.
+- **Équilibrage de charge** : GLBP permet l'équilibrage de charge entre plusieurs routeurs, en répartissant le trafic sur plusieurs passerelles.
+
+#### Avantages
+- **Distribution du trafic** : Capacité à utiliser plusieurs passerelles de manière simultanée, améliorant ainsi la répartition du trafic.
+- **Gestion de l'état de veille** : Comme HSRP, GLBP prend en charge la bascule en cas de panne, tout en permettant l'équilibrage de charge.
+
+#### Commandes de base (Cisco IOS)
+```bash
+interface GigabitEthernet0/1
+  glbp 1 ip 192.168.1.1
+  glbp 1 priority 100
+  glbp 1 preempt
+```
+
+Ces protocoles permettent tous d'assurer la redondance et la haute disponibilité dans les réseaux, mais ils diffèrent par leur fonctionnement, leurs avantages et leurs options de configuration.
+

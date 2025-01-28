@@ -48,3 +48,40 @@ STP est défini dans la norme **IEEE 802.1D** et fonctionne en créant une **arb
 - La configuration manuelle peut être complexe dans les grands réseaux.
 - RSTP ou MSTP sont préférables pour de meilleures performances.
 
+
+### 1. **Activer le protocole STP** (activé par défaut)
+Par défaut, STP est activé sur tous les switches Cisco. Si vous voulez vérifier son état :
+
+```bash
+Switch> enable
+Switch# show spanning-tree
+```
+
+Si STP est désactivé, vous pouvez l'activer sur un VLAN spécifique ou globalement :
+
+```bash
+Switch(config)# spanning-tree vlan [vlan-id]
+```
+
+---
+
+### 2. **Configuration de la priorité pour le Root Bridge**
+Le commutateur avec la plus **faible priorité** devient le **Root Bridge**. Vous pouvez forcer un commutateur à devenir Root Bridge en ajustant sa priorité :
+
+```bash
+Switch(config)# spanning-tree vlan [vlan-id] priority [valeur]
+```
+
+> ⚠️ La priorité par défaut est **32768**, et elle doit être un multiple de **4096**.
+
+Pour simplifier, Cisco propose aussi des commandes prédéfinies :
+
+- **Forcer comme Root Primary** (priorité la plus basse) :
+  ```bash
+  Switch(config)# spanning-tree vlan [vlan-id] root primary
+  ```
+- **Configurer un Root secondaire** (priorité légèrement plus haute) :
+  ```bash
+  Switch(config)# spanning-tree vlan [vlan-id] root secondary
+  ```
+

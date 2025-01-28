@@ -48,6 +48,11 @@ STP est défini dans la norme **IEEE 802.1D** et fonctionne en créant une **arb
 - La configuration manuelle peut être complexe dans les grands réseaux.
 - RSTP ou MSTP sont préférables pour de meilleures performances.
 
+---
+
+Voici une configuration typique du protocole **STP** sur un switch, en prenant comme exemple un équipement **Cisco** avec l'IOS (Interface de ligne de commande Cisco). Nous allons couvrir la configuration de base, puis des ajustements pour optimiser le comportement du STP.
+
+---
 
 ### 1. **Activer le protocole STP** (activé par défaut)
 Par défaut, STP est activé sur tous les switches Cisco. Si vous voulez vérifier son état :
@@ -84,4 +89,108 @@ Pour simplifier, Cisco propose aussi des commandes prédéfinies :
   ```bash
   Switch(config)# spanning-tree vlan [vlan-id] root secondary
   ```
+
+---
+
+### 3. **Activer Rapid Spanning Tree (RSTP)**
+RSTP (802.1w) est plus rapide que STP classique. Vous pouvez l'activer avec cette commande :
+
+```bash
+Switch(config)# spanning-tree mode rapid-pvst
+```
+
+---
+
+### 4. **Configurer un port comme Edge (PortFast)**
+Les ports connectés à des terminaux (PC, serveurs) ne doivent pas passer par tous les états du STP (Blocking, Listening, Learning). Vous pouvez activer **PortFast** pour ces ports :
+
+```bash
+Switch(config)# interface [interface-id]
+Switch(config-if)# spanning-tree portfast
+```
+
+Pour l’appliquer à plusieurs interfaces simultanément :
+
+```bash
+Switch(config)# interface range [interface-id début] - [interface-id fin]
+Switch(config-if-range)# spanning-tree portfast
+```
+
+> ⚠️ Ne jamais activer PortFast sur des ports connectés à d’autres switches !
+
+---
+
+### 5. **Protection contre les erreurs STP**
+Pour sécuriser le réseau contre des problèmes liés à STP (comme des Root Bridges non autorisés), configurez des mécanismes de protection :
+
+#### a. **BPDU Guard** (désactive un port recevant des BPDUs)
+```bash
+Switch(config)# interface [interface-id]
+Switch(config-if)# spanning-tree bpduguard enable
+```
+
+#### b. **Root Guard** (empêche un port de devenir le Root Bridge)
+```bash
+Switch(config)# interface [interface-id]
+Switch(config-if)# spanning-tree guard root
+```
+
+#### c. **Loop Guard** (protège contre les boucles dans des cas spécifiques)
+```bash
+Switch(config)# spanning-tree loopguard default
+```
+
+---
+
+### 6. **Vérifications après configuration**
+Pour confirmer que tout est bien configuré, utilisez les commandes suivantes :
+
+- Afficher l'état du STP :
+  ```bash
+  Switch# show spanning-tree
+  ```
+
+- Vérifier les Root Ports et les Designated Ports :
+  ```bash
+  Switch# show spanning-tree detail
+  ```
+
+- Vérifier les ports avec PortFast activé :
+  ```bash
+  Switch# show spanning-tree interface [interface-id] portfast
+  ```
+
+- Vérifier les protections comme BPDU Guard :
+  ```bash
+  Switch# show spanning-tree summary
+  ```
+
+---
+
+### Exemple complet
+Voici une configuration complète sur un switch :
+```bash
+Switch> enable
+Switch# configure terminal
+
+! Activer RSTP
+Switch(config)# spanning-tree mode rapid-pvst
+
+! Définir le switch comme Root Bridge pour le VLAN 10
+Switch(config)# spanning-tree vlan 10 root primary
+
+! Activer PortFast sur les ports connectés aux terminaux
+Switch(config)# interface range GigabitEthernet0/1 - 4
+Switch(config-if-range)# spanning-tree portfast
+Switch(config-if-range)# spanning-tree bpduguard enable
+
+! Sécuriser le réseau avec Root Guard
+Switch(config)# interface GigabitEthernet0/5
+Switch(config-if)# spanning-tree guard root
+
+! Sauvegarder la configuration
+Switch(config)# end
+Switch# write memory
+```
+
 

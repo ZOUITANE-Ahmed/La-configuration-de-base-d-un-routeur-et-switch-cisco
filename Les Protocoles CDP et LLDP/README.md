@@ -63,4 +63,72 @@ no lldp enable                # Désactiver LLDP sur une interface
 ### **📌 Conclusion**
 - **Si votre réseau est 100% Cisco** ➝ **CDP** est plus détaillé et pratique.  
 - **Si vous avez un réseau hétérogène (Cisco, Juniper, HP, etc.)** ➝ **LLDP** est préférable.  
-- Pour la **sécurité**, évitez d’activer CDP ou LLDP sur des interfaces exposées au public.  
+- Pour la **sécurité**, évitez d’activer CDP ou LLDP sur des interfaces exposées au public.
+
+---
+
+Voici la configuration des protocoles **CDP** et **LLDP** sur un **switch Cisco**.
+
+---
+
+## 📌 **Configuration de CDP (Cisco Discovery Protocol)**
+
+CDP est activé par défaut sur les équipements Cisco.  
+Si ce n'est pas le cas, voici comment l'activer :
+
+### ✅ **Activation de CDP**
+```bash
+Switch(config)# cdp run   # Active CDP globalement
+Switch(config-if)# cdp enable   # Active CDP sur une interface spécifique
+```
+
+### ❌ **Désactivation de CDP**
+```bash
+Switch(config)# no cdp run   # Désactive CDP globalement
+Switch(config-if)# no cdp enable   # Désactive CDP sur une interface spécifique
+```
+
+### 🔎 **Vérification de l'état de CDP**
+```bash
+Switch# show cdp   # Vérifie si CDP est actif
+Switch# show cdp neighbors   # Affiche les voisins CDP connectés
+Switch# show cdp neighbors detail   # Affiche des détails sur les voisins
+Switch# show cdp interface   # Vérifie si CDP est activé sur une interface spécifique
+```
+
+---
+
+## 📌 **Configuration de LLDP (Link Layer Discovery Protocol)**
+
+LLDP n'est **pas activé** par défaut sur les équipements Cisco.  
+Voici comment l’activer :
+
+### ✅ **Activation de LLDP**
+```bash
+Switch(config)# lldp run   # Active LLDP globalement
+Switch(config-if)# lldp transmit   # Active l’envoi des annonces LLDP sur une interface
+Switch(config-if)# lldp receive   # Active la réception des annonces LLDP sur une interface
+```
+
+### ❌ **Désactivation de LLDP**
+```bash
+Switch(config)# no lldp run   # Désactive LLDP globalement
+Switch(config-if)# no lldp transmit   # Désactive l’envoi des annonces LLDP sur une interface
+Switch(config-if)# no lldp receive   # Désactive la réception des annonces LLDP sur une interface
+```
+
+### 🔎 **Vérification de l'état de LLDP**
+```bash
+Switch# show lldp   # Vérifie si LLDP est actif
+Switch# show lldp neighbors   # Affiche les voisins LLDP connectés
+Switch# show lldp neighbors detail   # Affiche des détails sur les voisins
+Switch# show lldp interface   # Vérifie si LLDP est activé sur une interface spécifique
+```
+
+---
+
+## 🎯 **Cas d'usage**
+1. **Environnement 100% Cisco** ➝ **Utiliser CDP**  
+2. **Environnement multi-constructeurs** ➝ **Utiliser LLDP**  
+3. **Besoin d'un maximum d'informations sur les voisins** ➝ **Activer les deux (si compatibilité requise)**  
+

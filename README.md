@@ -1,248 +1,118 @@
-### Commandes de Base pour Routeurs et Commutateurs
+### 🔹 **Configuration de DHCP Snooping sur un Switch Cisco**  
 
-#### 1-Accès et Configuration
-- **Mode privilégié :**
-  ```bash
-  Router> enable
-  Switch> enable
-  ```
-- **Mode de configuration globale :**
-  ```bash
-  Router# configure terminal
-  Switch# configure terminal
-  ```
+**DHCP Snooping** est une fonctionnalité de sécurité des switches Cisco qui empêche les attaques DHCP, comme le **DHCP Spoofing** (quand un attaquant installe un faux serveur DHCP pour tromper les clients et intercepter leur trafic).  
 
-#### 2-Configuration de l'Hôte
-- **Renommer l'hôte :**
-  ```bash
-  Router(config)# hostname NouveauNom
-  Switch(config)# hostname NouveauNom
-  ```
+---
 
-#### 3-Configuration d'Interface FastEthernet ipv4 et ipv6 
-- **3-a-Interface FastEthernet ipv4 :**
-  ```bash
-  Router(config)# interface FastEthernet numéro
-  Router(config-if)# ip address @ masque_de_sous_réseau
-  Router(config-if)# no shutdown
-  Router(config-if)# exit
-  ```
-- **3-b-Interface FastEthernet ipv6 :**
-  ```bash
-  Router(config)# interface FastEthernet numéro
-  Router(config-if)# ipv6 address adresse_ipv6/préfixe
-  Router(config-if)# no shutdown
-  Router(config-if)# exit
-  ```
-### 3-1-Exemple de Configuration d'Interface FastEthernet ipv4 et ipv6 
-- **3-1-a-Interface FastEthernet ipv4 :**
-  ```bash
-  Router(config)# interface FastEthernet 0/0
-  Router(config-if)# ip address 192.168.1.1 255.255.255.0
-  Router(config-if)# no shutdown
-  Router(config-if)# exit
-  ```
-- **3-1-b-Pour afficher les informations d'une interface FastEthernet en ipv4 :**
-  ```bash
-  Router# show ip interface FastEthernet0/0
-  ```
-- **3-1-c-Interface FastEthernet ipv6 :**
-  ```bash
-  Router(config)# interface FastEthernet 0/0
-  Router(config-if)# ipv6 address 2001:db8::1/64
-  Router(config-if)# no shutdown
-  Router(config-if)# exit
-  ```
-  - **3-1-d-Pour afficher les informations d'une interface FastEthernet en IPv6:**
-  ```bash
-  Router# show ipv6 interface FastEthernet0/0
-  ```
-  -------------------------------------------
-  
-Voici comment configurer une interface série sur un routeur Cisco, y compris l'attribution d'une adresse IP et la configuration du taux de signalisation :
+## **📌 1. Fonctionnement de DHCP Snooping**
+- **Filtrage des réponses DHCP** : Seuls les ports de confiance peuvent envoyer des réponses DHCP (serveurs DHCP valides).
+- **Base de données de liaison DHCP** : Le switch garde une liste des adresses MAC-IP associées aux ports.
+- **Protection contre le DHCP Spoofing** : Empêche les faux serveurs DHCP de distribuer des adresses.
 
-### 4-Configuration d'une Interface Serial ipv4 et ipv6 
-1. **Sélectionner l'Interface Série :**
-   Remplacez `numéro` par le numéro de l'interface série (par exemple, `0/0`, `0/1`).
+---
+
+## **📌 2. Configuration de DHCP Snooping sur un Switch Cisco**
+Voici la configuration sur un **switch de niveau 2** connecté à un routeur DHCP.
+
+### **📍 Étape 1 : Activer DHCP Snooping sur le switch**
+```bash
+Switch# configure terminal
+Switch(config)# ip dhcp snooping
+Switch(config)# ip dhcp snooping vlan 10
+```
+✅ **Explication :**
+- **`ip dhcp snooping`** → Active la fonctionnalité DHCP Snooping.
+- **`ip dhcp snooping vlan 10`** → Active DHCP Snooping uniquement sur le VLAN 10.
+
+---
+
+### **📍 Étape 2 : Définir les ports de confiance**
+- Les ports connectés aux **serveurs DHCP** doivent être configurés comme **trusted**.
+- Tous les autres ports restent **untrusted** par défaut.
+
+#### ✅ **Configurer le port où est connecté le serveur DHCP**
+```bash
+Switch(config)# interface GigabitEthernet0/1
+Switch(config-if)# ip dhcp snooping trust
+Switch(config-if)# exit
+```
+
+#### ✅ **Configurer les ports où sont connectés les clients**
+```bash
+Switch(config)# interface range GigabitEthernet0/2 - 10
+Switch(config-if)# ip dhcp snooping limit rate 10
+Switch(config-if)# exit
+```
+✅ **Explication :**
+- **`ip dhcp snooping trust`** → Définit le port **G0/1** comme **de confiance** (DHCP valide).
+- **`ip dhcp snooping limit rate 10`** → Limite le nombre de paquets DHCP à 10 par seconde (protection contre les attaques DHCP Starvation).
+
+---
+
+### **📍 Étape 3 : Vérifier la Configuration**
+Après la configuration, on peut vérifier que **DHCP Snooping fonctionne correctement**.
+
+#### ✅ **Vérifier que DHCP Snooping est activé**
+```bash
+Switch# show ip dhcp snooping
+```
+
+#### ✅ **Vérifier la base de données DHCP Snooping (associations MAC-IP)**
+```bash
+Switch# show ip dhcp snooping binding
+```
+Tu verras une table contenant :
+- L’adresse IP assignée
+- L’adresse MAC du client
+- Le VLAN et le port où le client est connecté
+
+---
+
+## **📌 3. Protection contre les attaques supplémentaires**
+DHCP Snooping est souvent utilisé avec **DAI (Dynamic ARP Inspection)** et **IP Source Guard**.
+
+### ✅ **Activer Dynamic ARP Inspection (DAI)**
+Empêche les attaques **ARP Spoofing** en validant les paquets ARP :
+```bash
+Switch(config)# ip arp inspection vlan 10
+Switch(config)# interface GigabitEthernet0/1
+Switch(config-if)# ip arp inspection trust
+Switch(config-if)# exit
+```
+
+### ✅ **Activer IP Source Guard**
+Empêche un utilisateur de changer d’adresse IP après avoir obtenu une adresse DHCP :
+```bash
+Switch(config)# interface GigabitEthernet0/2
+Switch(config-if)# ip verify source
+Switch(config-if)# exit
+```
+
+---
+
+## **📌 4. Vérification Complète**
+Une fois tout configuré, voici comment tester :
+1. **Vérifie que les clients obtiennent bien une adresse IPv4** :
    ```bash
-   Router(config)# interface serial numéro
+   Switch# show ip dhcp snooping binding
    ```
+2. **Teste avec un faux serveur DHCP (sur un port non trusted)** :
+   - Il ne doit pas pouvoir envoyer des offres DHCP.
 
-2. **Attribuer une Adresse IP :**
-   Remplacez `@` par l'adresse IP souhaitée et `masque` par le masque de sous-réseau (par exemple, `255.255.255.0`).
-   ```bash
-   Router(config-if)# ip address @ masque
-   ```
+---
 
-3. **Configurer le Taux de Signalisation :**
-   Cette commande est généralement utilisée pour les interfaces DCE (Data Communications Equipment) pour définir le taux de signalisation. Remplacez `nombre` par la valeur appropriée en bits par seconde (par exemple, `64000`).
-   ```bash
-   Router(config-if)# clock rate nombre
-   ```
+## ✅ **Résumé**
+| **Fonction** | **Commande** |
+|-------------|-------------|
+| Activer DHCP Snooping | `ip dhcp snooping` |
+| Appliquer DHCP Snooping à un VLAN | `ip dhcp snooping vlan <VLAN>` |
+| Définir un port de confiance (DHCP valide) | `ip dhcp snooping trust` |
+| Limiter le trafic DHCP sur un port client | `ip dhcp snooping limit rate 10` |
+| Vérifier les bindings DHCP | `show ip dhcp snooping binding` |
+| Protéger contre ARP Spoofing | `ip arp inspection vlan <VLAN>` |
+| Activer IP Source Guard | `ip verify source` |
 
-4. **Activer l'Interface :**
-   Cette commande active l'interface.
-   ```bash
-   Router(config-if)# no shutdown
-   ```
+---
 
-5. **Sortir de la Configuration de l'Interface :**
-   Cette commande vous ramène en mode de configuration globale.
-   ```bash
-   Router(config-if)# exit
-   ```
-
-### 4-1-Exemple de Configuration d'Interface Serial ipv4 et ipv6 
-Voici un exemple de séquence de commandes avec des valeurs spécifiques :
-**4-1-a-Configuration d'une Interface Serial ipv4 :**
-```bash
-Router(config)# interface serial 0/0
-Router(config-if)# ip address 192.168.1.1 255.255.255.0
-Router(config-if)# clock rate 64000
-Router(config-if)# no shutdown
-Router(config-if)# exit
-```
-  
-### 4-2-Exemple de Configuration d'Interface Serial ipv6
-```bash
-Router(config)# interface serial 0/0
-Router(config-if)# ipv6 address 2001:cafe:2::2/64
-Router(config-if)# no shutdown
-Router(config-if)# exit
-```
-Pour afficher un résumé de toutes les interfaces sur un routeur Cisco, y compris les adresses IPv4 ou IPv6 et l'état opérationnel, vous pouvez utiliser la commande suivante :
-
-### 4-3Commande pour Afficher un Résumé des Interfaces
-```bash
-Router# show ip interface brief
-```
-
-### 4-3-aInformations Fournies par la Commande
-- **Interface :** Nom de l'interface (par exemple, FastEthernet0/0, Serial0/0).
-- **IP Address :** Adresse IPv4 assignée à l'interface.
-- **Status :** État opérationnel de l'interface (par exemple, "up" ou "down").
-- **Protocol :** État du protocole (par exemple, "up" ou "down").
-
-### Exemple de Sortie
-Voici un exemple de sortie de la commande `show ip interface brief` :
-
-```
-Interface              IP Address      Status      Protocol
-FastEthernet0/0       192.168.1.1     up          up
-Serial0/0             2001:db8::1     up          up
-FastEthernet0/1       unassigned      administratively down down
-Serial0/1             192.168.2.1     down        down
-```
-
-### 4-3-bPour les Interfaces IPv6
-Pour afficher un résumé des interfaces avec les adresses IPv6, utilisez la commande suivante :
-
-```bash
-Router# show ipv6 interface brief
-```
-
-### Exemple de Sortie pour IPv6
-Voici un exemple de sortie de la commande `show ipv6 interface brief` :
-
-```
-Interface              IPv6 Address              Status      Protocol
-Serial0/0             2001:db8::1/64            up          up
-FastEthernet0/0       unassigned                 down        down
-```
-
-### Remarques
-- Ces commandes vous permettent de vérifier rapidement l'état et la configuration des interfaces sur votre routeur, facilitant ainsi le dépannage et la gestion du réseau.
-
-
-
-### 4-Configuration des Mots de Passe
-- **4-1-Accès par terminal :**
-  ```bash
-  Router(config)# line console 0
-  Router(config-line)# password mot_de_passe
-  Router(config-line)# login
-  Router(config-line)# exit
-  ```
-- **4-2-Accès par Telnet :**
-  ```bash
-  Router(config)# line vty 0 4
-  Router(config-line)# password mot_de_passe
-  Router(config-line)# login
-  Router(config-line)# exit
-  ```
-- **4-3-Accès SSH :**
-  ```bash
-  Router(config)# line vty 0 4
-  Router(config-line)# transport input ssh
-  Router(config-line)# login local
-  Router(config-line)# exit
-  ```
-- **4-4-Mot de passe privilégié (crypté) :**
-  ```bash
-  Router(config)# enable secret mot_de_passe
-  ```
-- **4-5-Crypter tous les mots de passe :**
-  ```bash
-  Router(config)# service password-encryption
-  ```
-
-### 5-Configuration du Bannière :**
-  ```bash
-  Router(config)# banner motd # le message #
-  ```
-
-### 6-Configuration du Domaine
-```bash
-Router(config)# ip domain-name exemple.ma
-```
-
-### 7-Génération de Clés RSA pour SSH
-```bash
-Router(config)# crypto key generate rsa
-Router(config)# ip ssh version 2
-```
-
-### 8-Création et Attribution de VLAN
-- **8-1-Création de VLAN :**
-  ```bash
-  Switch# configure terminal
-  Switch(config)# vlan vlan-id
-  Switch(config-vlan)# name vlan-name
-  Switch(config-vlan)# end
-  ```
-- **8-2-Attribution de Port à des VLAN :**
-  ```bash
-  Switch# configure terminal
-  Switch(config)# interface interface-id
-  Switch(config-if)# switchport mode access
-  Switch(config-if)# switchport access vlan vlan-id
-  Switch(config-if)# exit
-  ```
-### 9-commandes de vérification
-
-  Voici un tableau récapitulatif des commandes de vérification sur un commutateur Cisco, avec les tâches et les commandes associées :
-
-| **Tâche**                                               | **Commande IOS**                        |
-|--------------------------------------------------------|-----------------------------------------|
-| Affichez la configuration initiale actuelle            | `Switch# show startup-config`          |
-| Affichez la configuration courante                      | `Switch# show running-config`          |
-| Affichez les informations sur le système de fichiers Flash | `Switch# show flash`                  |
-| Affichez l'état matériel et logiciel du système        | `Switch# show version`                 |
-| Affichez l'historique des commandes exécutées          | `Switch# show history`                 |
-| Affichez la table d'adresses MAC                       | `Switch# show mac-address-table` ou `Switch# show mac address-table`      |
-
-### Remarques :
-- **show startup-config** : Montre la configuration sauvegardée lors du dernier redémarrage.
-- **show running-config** : Montre la configuration actuelle en cours d'exécution sur le commutateur.
-- **show flash** : Affiche des informations sur le système de fichiers Flash, y compris l'espace libre et les fichiers stockés.
-- **show version** : Fournit des informations sur le matériel et le logiciel, y compris la version IOS.
-- **show history** : Affiche l'historique des commandes que l'utilisateur a exécutées.
-- **show mac-address-table** ou **show mac address-table** : Affiche la table des adresses MAC, montrant les adresses MAC apprises et les ports correspondants.
-
-
-Voici un résumé structuré des informations que vous avez fournies concernant DTP, VTP, et la configuration des trunks sur des commutateurs Cisco :
-
-
-
-
-
+### 🎯 **Conclusion**
+Avec **DHCP Snooping**, tu sécurises ton réseau contre les attaques **DHCP Spoofing** et **DHCP Starvation**. En combinant avec **DAI** et **IP Source Guard**, tu obtiens une protection complète contre les attaques de falsification d’IP et ARP.

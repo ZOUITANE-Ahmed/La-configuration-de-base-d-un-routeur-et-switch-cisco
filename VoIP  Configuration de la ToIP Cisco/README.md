@@ -1,4 +1,4 @@
-# 🕒 **VoIP : Configuration de la ToIP Cisco **  
+### **VoIP : Configuration de la ToIP Cisco **  
 
 La configuration de la ToIP Cisco que vous avez partagée inclut plusieurs étapes importantes pour le serveur DHCP, l'activation du service de téléphonie, et la configuration des téléphones sur le **Cisco Unified CME (CallManager Express)**. Voici une explication détaillée de chaque étape mentionnée, ainsi que quelques ajustements et explications pour une meilleure compréhension.
 

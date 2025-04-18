@@ -1,118 +1,132 @@
-### 🔹 **Configuration de DHCP Snooping sur un Switch Cisco**  
-
-**DHCP Snooping** est une fonctionnalité de sécurité des switches Cisco qui empêche les attaques DHCP, comme le **DHCP Spoofing** (quand un attaquant installe un faux serveur DHCP pour tromper les clients et intercepter leur trafic).  
+**commandes de base** pour la **configuration d’un switch et d’un routeur Cisco** en ligne de commande (CLI), utiles dans un contexte d’apprentissage, de laboratoire ou d’administration réseau :
 
 ---
 
-## **📌 1. Fonctionnement de DHCP Snooping**
-- **Filtrage des réponses DHCP** : Seuls les ports de confiance peuvent envoyer des réponses DHCP (serveurs DHCP valides).
-- **Base de données de liaison DHCP** : Le switch garde une liste des adresses MAC-IP associées aux ports.
-- **Protection contre le DHCP Spoofing** : Empêche les faux serveurs DHCP de distribuer des adresses.
+### 🔌 1. Configuration d’un **Switch Cisco**
 
----
-
-## **📌 2. Configuration de DHCP Snooping sur un Switch Cisco**
-Voici la configuration sur un **switch de niveau 2** connecté à un routeur DHCP.
-
-### **📍 Étape 1 : Activer DHCP Snooping sur le switch**
+#### ➤ Accès au switch
 ```bash
+Switch> enable
 Switch# configure terminal
-Switch(config)# ip dhcp snooping
-Switch(config)# ip dhcp snooping vlan 10
-```
-✅ **Explication :**
-- **`ip dhcp snooping`** → Active la fonctionnalité DHCP Snooping.
-- **`ip dhcp snooping vlan 10`** → Active DHCP Snooping uniquement sur le VLAN 10.
-
----
-
-### **📍 Étape 2 : Définir les ports de confiance**
-- Les ports connectés aux **serveurs DHCP** doivent être configurés comme **trusted**.
-- Tous les autres ports restent **untrusted** par défaut.
-
-#### ✅ **Configurer le port où est connecté le serveur DHCP**
-```bash
-Switch(config)# interface GigabitEthernet0/1
-Switch(config-if)# ip dhcp snooping trust
-Switch(config-if)# exit
 ```
 
-#### ✅ **Configurer les ports où sont connectés les clients**
+#### ➤ Renommer le switch
 ```bash
-Switch(config)# interface range GigabitEthernet0/2 - 10
-Switch(config-if)# ip dhcp snooping limit rate 10
-Switch(config-if)# exit
-```
-✅ **Explication :**
-- **`ip dhcp snooping trust`** → Définit le port **G0/1** comme **de confiance** (DHCP valide).
-- **`ip dhcp snooping limit rate 10`** → Limite le nombre de paquets DHCP à 10 par seconde (protection contre les attaques DHCP Starvation).
-
----
-
-### **📍 Étape 3 : Vérifier la Configuration**
-Après la configuration, on peut vérifier que **DHCP Snooping fonctionne correctement**.
-
-#### ✅ **Vérifier que DHCP Snooping est activé**
-```bash
-Switch# show ip dhcp snooping
+Switch(config)# hostname Switch1
 ```
 
-#### ✅ **Vérifier la base de données DHCP Snooping (associations MAC-IP)**
+#### ➤ Désactiver la recherche DNS (évite les lenteurs si commande erronée)
 ```bash
-Switch# show ip dhcp snooping binding
-```
-Tu verras une table contenant :
-- L’adresse IP assignée
-- L’adresse MAC du client
-- Le VLAN et le port où le client est connecté
-
----
-
-## **📌 3. Protection contre les attaques supplémentaires**
-DHCP Snooping est souvent utilisé avec **DAI (Dynamic ARP Inspection)** et **IP Source Guard**.
-
-### ✅ **Activer Dynamic ARP Inspection (DAI)**
-Empêche les attaques **ARP Spoofing** en validant les paquets ARP :
-```bash
-Switch(config)# ip arp inspection vlan 10
-Switch(config)# interface GigabitEthernet0/1
-Switch(config-if)# ip arp inspection trust
-Switch(config-if)# exit
+Switch1(config)# no ip domain-lookup
 ```
 
-### ✅ **Activer IP Source Guard**
-Empêche un utilisateur de changer d’adresse IP après avoir obtenu une adresse DHCP :
+#### ➤ Configuration d’un mot de passe pour l’accès en mode privilégié
 ```bash
-Switch(config)# interface GigabitEthernet0/2
-Switch(config-if)# ip verify source
-Switch(config-if)# exit
+Switch1(config)# enable secret Cisco123
+```
+
+#### ➤ Configuration de la ligne console
+```bash
+Switch1(config)# line console 0
+Switch1(config-line)# password cisco
+Switch1(config-line)# login
+Switch1(config-line)# exit
+```
+
+#### ➤ Configuration de la ligne VTY (accès SSH/Telnet)
+```bash
+Switch1(config)# line vty 0 4
+Switch1(config-line)# password cisco
+Switch1(config-line)# login
+Switch1(config-line)# exit
+```
+
+#### ➤ Configuration d’une adresse IP sur une interface VLAN
+```bash
+Switch1(config)# interface vlan 1
+Switch1(config-if)# ip address 192.168.1.2 255.255.255.0
+Switch1(config-if)# no shutdown
+Switch1(config-if)# exit
+```
+
+#### ➤ Définir la passerelle par défaut
+```bash
+Switch1(config)# ip default-gateway 192.168.1.1
+```
+
+#### ➤ Enregistrer la configuration
+```bash
+Switch1# write memory
+# ou
+Switch1# copy running-config startup-config
 ```
 
 ---
 
-## **📌 4. Vérification Complète**
-Une fois tout configuré, voici comment tester :
-1. **Vérifie que les clients obtiennent bien une adresse IPv4** :
-   ```bash
-   Switch# show ip dhcp snooping binding
-   ```
-2. **Teste avec un faux serveur DHCP (sur un port non trusted)** :
-   - Il ne doit pas pouvoir envoyer des offres DHCP.
+### 🌐 2. Configuration d’un **Routeur Cisco**
+
+#### ➤ Accès au routeur
+```bash
+Router> enable
+Router# configure terminal
+```
+
+#### ➤ Renommer le routeur
+```bash
+Router(config)# hostname R1
+```
+
+#### ➤ Configuration de l’interface (exemple : GigabitEthernet 0/0)
+```bash
+R1(config)# interface gigabitEthernet 0/0
+R1(config-if)# ip address 192.168.1.1 255.255.255.0
+R1(config-if)# no shutdown
+R1(config-if)# exit
+```
+
+#### ➤ Configuration d’une autre interface (ex : réseau WAN)
+```bash
+R1(config)# interface gigabitEthernet 0/1
+R1(config-if)# ip address 10.0.0.1 255.255.255.252
+R1(config-if)# no shutdown
+R1(config-if)# exit
+```
+
+#### ➤ Ajouter une route statique
+```bash
+R1(config)# ip route 192.168.2.0 255.255.255.0 10.0.0.2
+```
+
+#### ➤ Configuration de NAT/PAT (selon contexte)
+```bash
+# Exemple simplifié
+R1(config)# ip nat inside source list 1 interface gigabitEthernet 0/1 overload
+R1(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+R1(config)# interface gigabitEthernet 0/0
+R1(config-if)# ip nat inside
+R1(config-if)# exit
+R1(config)# interface gigabitEthernet 0/1
+R1(config-if)# ip nat outside
+```
+
+#### ➤ Enregistrer la configuration
+```bash
+R1# write memory
+# ou
+R1# copy running-config startup-config
+```
 
 ---
 
-## ✅ **Résumé**
-| **Fonction** | **Commande** |
-|-------------|-------------|
-| Activer DHCP Snooping | `ip dhcp snooping` |
-| Appliquer DHCP Snooping à un VLAN | `ip dhcp snooping vlan <VLAN>` |
-| Définir un port de confiance (DHCP valide) | `ip dhcp snooping trust` |
-| Limiter le trafic DHCP sur un port client | `ip dhcp snooping limit rate 10` |
-| Vérifier les bindings DHCP | `show ip dhcp snooping binding` |
-| Protéger contre ARP Spoofing | `ip arp inspection vlan <VLAN>` |
-| Activer IP Source Guard | `ip verify source` |
+### 🛠️ Astuce
+Pour **vérifier** les configurations :
+```bash
+# Voir les interfaces
+show ip interface brief
 
----
+# Voir la configuration en cours
+show running-config
 
-### 🎯 **Conclusion**
-Avec **DHCP Snooping**, tu sécurises ton réseau contre les attaques **DHCP Spoofing** et **DHCP Starvation**. En combinant avec **DAI** et **IP Source Guard**, tu obtiens une protection complète contre les attaques de falsification d’IP et ARP.
+# Voir la table de routage
+show ip route
+```

@@ -41,6 +41,58 @@ Switch1(config-line)# login
 Switch1(config-line)# exit
 ```
 
+### 🔐 **Configuration de l’accès SSH sur un switch ou un routeur Cisco**
+
+#### 1. 🌍 Définir un nom d’hôte et un nom de domaine
+```bash
+Switch(config)# hostname Switch1
+Switch1(config)# ip domain-name monreseau.local
+```
+
+#### 2. 👤 Créer un utilisateur avec mot de passe
+```bash
+Switch1(config)# username admin privilege 15 secret MotDePasseFort
+```
+
+#### 3. 🔑 Générer les clés RSA
+```bash
+Switch1(config)# crypto key generate rsa
+# Si demandé, entrer une taille (minimum recommandé : 1024 bits)
+How many bits in the modulus [512]: 1024
+```
+
+#### 4. 🧑‍💻 Activer SSH sur les lignes VTY
+```bash
+Switch1(config)# line vty 0 4
+Switch1(config-line)# transport input ssh
+Switch1(config-line)# login local
+Switch1(config-line)# exit
+```
+
+#### 5. 🛡️ (Optionnel mais recommandé) Limiter la version SSH à la version 2
+```bash
+Switch1(config)# ip ssh version 2
+```
+
+#### 6. 💾 Enregistrer la configuration
+```bash
+Switch1# copy running-config startup-config
+```
+
+---
+
+### ✅ Vérification
+
+- Pour voir si SSH est activé :
+```bash
+Switch1# show ip ssh
+```
+
+- Pour tester la connexion SSH depuis un autre hôte :
+```bash
+ssh admin@192.168.1.2
+```
+
 #### ➤ Configuration d’une adresse IP sur une interface VLAN
 ```bash
 Switch1(config)# interface vlan 1

@@ -128,6 +128,100 @@ Router# configure terminal
 Router(config)# hostname R1
 ```
 
+**configuration complète, claire et sécurisée** pour activer l’**accès SSH sur un routeur Cisco**. C’est très similaire à un switch, avec quelques ajustements.
+
+## 🔧 **Configuration complète de l’accès SSH sur un routeur Cisco**
+
+---
+
+### 1️⃣ **Configurer le nom d’hôte et le nom de domaine**
+```bash
+Router> enable
+Router# configure terminal
+Router(config)# hostname R1
+R1(config)# ip domain-name monreseau.local
+```
+
+---
+
+### 2️⃣ **Créer un utilisateur avec mot de passe sécurisé**
+```bash
+R1(config)# username admin privilege 15 secret MotDePasseFort
+```
+
+---
+
+### 3️⃣ **Générer les clés RSA pour SSH**
+```bash
+R1(config)# crypto key generate rsa
+How many bits in the modulus [512]: 1024
+```
+
+> ⚠️ Il faut un minimum de **1024 bits** pour SSH version 2.
+
+---
+
+### 4️⃣ **Activer SSH sur les lignes VTY**
+```bash
+R1(config)# line vty 0 4
+R1(config-line)# login local
+R1(config-line)# transport input ssh
+R1(config-line)# exit
+```
+
+---
+
+### 5️⃣ **Forcer l’utilisation de SSH version 2**
+```bash
+R1(config)# ip ssh version 2
+```
+
+---
+
+### 6️⃣ **Configurer une adresse IP sur une interface (ex: G0/0)**
+```bash
+R1(config)# interface GigabitEthernet0/0
+R1(config-if)# ip address 192.168.1.1 255.255.255.0
+R1(config-if)# no shutdown
+R1(config-if)# exit
+```
+
+---
+
+### 7️⃣ **(Optionnel) Configurer la passerelle par défaut**
+```bash
+R1(config)# ip default-gateway 192.168.1.254
+```
+
+---
+
+### 8️⃣ **Sauvegarder la configuration**
+```bash
+R1# copy running-config startup-config
+```
+
+---
+
+## ✅ Vérification
+
+- Vérifier que SSH est actif :
+```bash
+R1# show ip ssh
+```
+
+- Vérifier l’état des interfaces :
+```bash
+R1# show ip interface brief
+```
+
+---
+
+## 🔐 Connexion SSH depuis un poste client :
+
+```bash
+ssh admin@192.168.1.1
+```
+
 #### ➤ Configuration de l’interface (exemple : GigabitEthernet 0/0)
 ```bash
 R1(config)# interface gigabitEthernet 0/0

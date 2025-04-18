@@ -41,7 +41,7 @@ Switch1(config-line)# login
 Switch1(config-line)# exit
 ```
 
-### 🔐 **Configuration de l’accès SSH sur un switch ou un routeur Cisco**
+### 🔐 **Configuration de l’accès SSH sur un switch  Cisco**
 
 #### 1. 🌍 Définir un nom d’hôte et un nom de domaine
 ```bash
